@@ -181,6 +181,8 @@ typedef NS_ENUM(NSUInteger, RSKImageCropMode) {
  */
 @property (strong, nonatomic, readonly) UIButton *chooseButton;
 
+@property (strong, nonatomic) dispatch_block_t onViewLoadBlock;
+
 /// -------------------------------------------
 /// @name Checking of the Interface Orientation
 /// -------------------------------------------
