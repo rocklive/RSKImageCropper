@@ -129,7 +129,7 @@ typedef NS_ENUM(NSUInteger, RSKImageCropMode) {
  
  @discussion The value is calculated at run time.
  */
-@property (readonly, nonatomic) CGRect cropRect;
+@property (nonatomic) CGRect cropRect;
 
 /**
  A value that specifies the current rotation angle of the image in radians.

@@ -56,6 +56,7 @@ static const CGFloat kLayoutImageScrollViewAnimationDuration = 0.25;
 
 @property (readonly, nonatomic) CGRect rectForMaskPath;
 @property (readonly, nonatomic) CGRect rectForClipPath;
+@property (nonatomic)           CGRect deferredCropRect;
 
 @property (strong, nonatomic) UILabel *moveAndScaleLabel;
 @property (strong, nonatomic) UIButton *cancelButton;
@@ -171,6 +172,7 @@ static const CGFloat kLayoutImageScrollViewAnimationDuration = 0.25;
     
     if (!self.imageScrollView.zoomView) {
         [self displayImage];
+        [self applyDefferedCropRect];
     }
 }
 
@@ -371,6 +373,40 @@ static const CGFloat kLayoutImageScrollViewAnimationDuration = 0.25;
     }
     
     return cropRect;
+}
+
+- (void) setCropRect:(CGRect)cropRect{
+    if(CGRectIsNull(cropRect))
+        return;
+    
+    if (self.isViewLoaded)
+    {
+        [self applyCropRect:cropRect];
+    }
+    else
+    {
+        self.deferredCropRect = cropRect;
+    }
+}
+
+- (void) applyDefferedCropRect{
+    if(CGRectIsEmpty(self.deferredCropRect))
+        return;
+    
+    [self applyCropRect:self.deferredCropRect];
+    self.deferredCropRect = CGRectZero;
+}
+
+- (void) applyCropRect:(CGRect)cropRect{
+    const CGRect scrollRect = self.imageScrollView.bounds;
+    
+    const CGFloat scale = fmax(cropRect.size.height / CGRectGetHeight(scrollRect),
+                               cropRect.size.width  / CGRectGetWidth(scrollRect));
+    
+    const CGPoint offset = CGPointMake(round(cropRect.origin.x / scale), round(cropRect.origin.y / scale));
+    
+    [self.imageScrollView setZoomScale:1.0 / scale animated:NO];
+    [self.imageScrollView setContentOffset:offset animated:NO];
 }
 
 - (CGRect)rectForClipPath
